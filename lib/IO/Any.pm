@@ -193,7 +193,7 @@ sub slurp {
 }
 
 
-=head2 slurp($what, $data)
+=head2 spew($what, $data)
 
 Writes C<$data> to C<$what>.
 

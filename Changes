@@ -1,5 +1,8 @@
 Revision history for IO-Any
 
+0.02    10 Sep 2009
+    - croak open errors
+
 0.01    28 Aug 2009
         First version, released on an unsuspecting world.
 

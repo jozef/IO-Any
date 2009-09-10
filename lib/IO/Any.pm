@@ -49,7 +49,7 @@ There are two methods C</slurp> and C</spew> to read/write whole C<$what>.
 use warnings;
 use strict;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use 5.010;
 
@@ -97,7 +97,7 @@ sub new {
         when ('file')   {
             my $fh = IO::File->new;
             $fh->open($proper_what, $how)
-                or die 'error opening file "'.$proper_what.'" - '.$!;
+                or croak 'error opening file "'.$proper_what.'" - '.$!;
             return $fh;
         }
         when ('http')   { die 'no http support jet :-|' }

@@ -39,17 +39,32 @@ IO::Any - open anything
 =head1 DESCRIPTION
 
 The aim is to provide read/write anything. The module tries to guess
-C<$what> the "anything" is based on some rules. See C</new> method Pod for
-examples and C</new> and C</_guess_what> code for the implementation.
+C<$what> the "anything" is based on some rules. See L</new> method Pod for
+examples and L</new> and L</_guess_what> code for the implementation.
 
-There are two methods C</slurp> and C</spew> to read/write whole C<$what>.
+There are two methods L</slurp> and L</spew> to read/write whole C<$what>.
+
+=head1 MOTIVATION
+
+The purpose is to be able to write portable one-liners (both commandline
+and inside program) to read/write/slurp/spew files/strings/$what-ever.
+As I'm sick of writing C<< File::Spec->catfile('folder', 'filename')  >>
+or C<< use Path::Class; dir(); file(); >>.
+
+First time I've used L<IO::Any> for L<JSON::Util> where for the function
+to encode and decode files I can just say put as an argumen anything that
+L<IO::Any> accepts. It's then up to the users of that module to pass an array
+if it's a file, scalar ref if it is a string or relay on the module to
+guess $what.
+
+Any suggestions, questions and also demotivations are more than welcome!
 
 =cut
 
 use warnings;
 use strict;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use 5.010;
 
@@ -146,7 +161,7 @@ sub _guess_what {
 
 =head2 read($what)
 
-Same as C<<IO::Any->new($what, '<');>> or C<<IO::Any->new($what);>>.
+Same as C<< IO::Any->new($what, '<'); >> or C<< IO::Any->new($what); >>.
 
 =cut
 
@@ -162,7 +177,7 @@ sub read {
 
 =head2 write($what)
 
-Same as C<<IO::Any->new($what, '>');>>
+Same as C<< IO::Any->new($what, '>'); >>
 
 =cut
 
@@ -215,6 +230,10 @@ sub spew {
 
 __END__
 
+=head1 SEE ALSO
+
+L<IO::All>, L<File::Spec>, L<Path::Class>
+
 =head1 AUTHOR
 
 Jozef Kutej, C<< <jkutej at cpan.org> >>
@@ -238,6 +257,10 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
+
+=item * GitHub: issues
+
+L<http://github.com/jozef/IO-Any/issues>
 
 =item * RT: CPAN's request tracker
 

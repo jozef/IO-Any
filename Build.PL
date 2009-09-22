@@ -26,6 +26,13 @@ my $builder = Module::Build->new(
     create_makefile_pl => 'traditional',
     create_readme       => 1,
     sign                => 1,
+    meta_merge => {
+        resources => {
+            repository => 'git://github.com/jozef/IO-Any.git',
+            bugtracker => 'http://github.com/jozef/IO-Any/issues',
+        },
+        keywords => [ qw/ io portable slurp spew / ],
+    },
 );
 
 $builder->create_build_script();

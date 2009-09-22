@@ -1,5 +1,10 @@
 Revision history for IO-Any
 
+0.03    21 Sep 2009
+    - fixed Pod rendering issues, added L<IO::All>,
+      added SEE ALSO and MOTIVATION sections
+      (RT #49860 - thanks to SREZIC [...] cpan.org) 
+
 0.02    20 Sep 2009
     - croak open errors
 

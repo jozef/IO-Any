@@ -1,5 +1,8 @@
 Revision history for IO-Any
 
+0.04    25 Dec 2009
+    - use AnyEvent for slurp() and spew() if loaded
+
 0.03    21 Sep 2009
     - fixed Pod rendering issues, added L<IO::All>,
       added SEE ALSO and MOTIVATION sections

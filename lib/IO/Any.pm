@@ -64,7 +64,7 @@ Any suggestions, questions and also demotivations are more than welcome!
 use warnings;
 use strict;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use 5.010;
 
@@ -195,6 +195,8 @@ sub write {
 
 Returns content of C<$what>.
 
+If L<AnyEvent> is loaded then uses event loop to read the content.
+
 =cut
 
 sub slurp {
@@ -204,13 +206,45 @@ sub slurp {
         if @_;
     
     my $fh = $class->read($what);
-    return do { local $/; <$fh> };
+    
+    # use event loop when AnyEvent is loaded (skip IO::String, doesn't work and makes no sense)
+    if ($INC{'AnyEvent.pm'} and not $fh->isa('IO::String')) {
+        eval 'use AnyEvent::Handle'
+            if not $INC{'AnyEvent/Handle.pm'};
+        my $eof = AnyEvent->condvar;
+        my $content = '';
+        my $hdl = AnyEvent::Handle->new(
+            fh      => $fh,
+            on_read => sub {
+                $content .= delete $_[0]->{'rbuf'};
+            },
+            on_eof  => sub {
+                $eof->send;
+            },
+            on_error => sub {
+                my ($hdl, $fatal, $msg) = @_;
+                $hdl->destroy;
+                $eof->croak($msg);
+            }
+        );
+
+        $eof->recv;
+        $hdl->destroy;
+        close $fh;
+        return $content;
+    }
+    
+    my $content = do { local $/; <$fh> };
+    close $fh;
+    return $content;    
 }
 
 
 =head2 spew($what, $data)
 
 Writes C<$data> to C<$what>.
+
+If L<AnyEvent> is loaded then uses event loop to write the content.
 
 =cut
 
@@ -222,7 +256,36 @@ sub spew {
         if @_;
     
     my $fh = $class->write($what);
-    return $fh->print($data);
+
+    # use event loop when AnyEvent is loaded (skip IO::String, doesn't work and makes no sense)
+    if ($INC{'AnyEvent.pm'} and not $fh->isa('IO::String')) {
+        eval 'use AnyEvent::Handle'
+            if not $INC{'AnyEvent/Handle.pm'};
+        
+        my $eof = AnyEvent->condvar;
+        my $hdl = AnyEvent::Handle->new(
+            fh       => $fh,
+            on_drain => sub {
+                $eof->send;
+            },
+            on_error => sub {
+                my ($hdl, $fatal, $msg) = @_;
+                $hdl->destroy;
+                $eof->croak($msg);
+            }
+        );
+        
+        $hdl->push_write($data);
+
+        $eof->recv;
+        $hdl->destroy;
+        close $fh;
+        return;
+    }
+
+    $fh->print($data);
+    close($fh);
+    return;
 }
 
 1;

@@ -72,11 +72,12 @@ use Carp 'croak';
 use Scalar::Util 'blessed';
 use IO::String;
 use IO::File;
+use IO::AtomicFile;
 use File::Spec;
 
 =head1 METHODS
 
-=head2 new($what, $how)
+=head2 new($what, $how, $options)
 
 Open C<$what> in C<$how> mode.
 
@@ -96,26 +97,40 @@ C<$what> can be:
 Returns filehandle. L<IO::String> for 'string', L<IO::File> for 'file'.
 'http' not implemented jet :)
 
+Here are alvailable C<%$options> options:
+
+    atomic    true/false if the file operations should be done using L<IO::AtomicFile> or L<IO::File>
+
 =cut
 
 sub new {
     my $class = shift;
     my $what  = shift;
     my $how   = shift || '<';
+    my $opt   = shift || {};
     croak 'too many arguments'
         if @_;
+    
+    croak 'expecting hash ref'
+        if ref $opt ne 'HASH';
+    foreach my $key (keys %$opt) {
+        croak 'unknown option '.$key
+            if (not $key ~~ ['atomic']);
+    }
     
     my ($type, $proper_what) = $class->_guess_what($what);
     
     given ($type) {
         when ('string') { return IO::String->new($proper_what) }
         when ('file')   {
-            my $fh = IO::File->new;
+            my $fh = $opt->{'atomic'} ? IO::AtomicFile->new() : IO::File->new();
             $fh->open($proper_what, $how)
                 or croak 'error opening file "'.$proper_what.'" - '.$!;
             return $fh;
         }
-        when ('http')   { die 'no http support jet :-|' }
+        when ('iofile')   { return $proper_what }
+        when ('iostring') { return $proper_what }
+        when ('http')     { die 'no http support jet :-|' }
     }
 }
 
@@ -136,8 +151,16 @@ sub _guess_what {
     my $class = shift;
     my $what  = shift;
     
-    if (blessed $what) {
-        return 'no blessed support jet';
+    given (blessed $what) {
+        when (undef) {}            # not blessed, do nothing
+        when ('Path::Class::File') { $what = $what->stringify }
+        when (['IO::File', 'IO::AtomicFile']) {
+            croak 'passed unopened IO::File'
+                if not $what->opened;
+            return ('iofile', $what);
+        }
+        when ('IO::String')        { return ('iostring', $what) }
+        default { croak 'no support for '.$_ };
     }
     
     given (ref $what) {
@@ -184,10 +207,11 @@ Same as C<< IO::Any->new($what, '>'); >>
 sub write {
     my $class = shift;
     my $what  = shift;
+    my $opt   = shift;
     croak 'too many arguments'
         if @_;
     
-    return $class->new($what, '>');
+    return $class->new($what, '>', $opt);
 }
 
 
@@ -240,7 +264,7 @@ sub slurp {
 }
 
 
-=head2 spew($what, $data)
+=head2 spew($what, $data, $opt)
 
 Writes C<$data> to C<$what>.
 
@@ -252,10 +276,11 @@ sub spew {
     my $class = shift;
     my $what  = shift;
     my $data  = shift;
+    my $opt   = shift;
     croak 'too many arguments'
         if @_;
     
-    my $fh = $class->write($what);
+    my $fh = $class->write($what, $opt);
 
     # use event loop when AnyEvent is loaded (skip IO::String, doesn't work and makes no sense)
     if ($INC{'AnyEvent.pm'} and not $fh->isa('IO::String')) {
@@ -283,8 +308,8 @@ sub spew {
         return;
     }
 
-    $fh->print($data);
-    close($fh);
+    print $fh $data;
+    $fh->close || croak 'failed to close file - '.$!;
     return;
 }
 

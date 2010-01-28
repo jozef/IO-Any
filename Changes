@@ -1,6 +1,7 @@
 Revision history for IO-Any
 
 0.04    25 Dec 2009
+    - allow atomic writes using IO::AtomicFile
     - use AnyEvent for slurp() and spew() if loaded
 
 0.03    21 Sep 2009

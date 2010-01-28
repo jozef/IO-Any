@@ -4,11 +4,12 @@ use strict;
 use warnings;
 
 #use Test::More 'no_plan';
-use Test::More tests => 17;
+use Test::More tests => 20;
 use Test::Differences;
 use File::Spec;
 use File::Temp 'tempdir';
 use File::Slurp 'read_file';
+use Test::Exception;
 
 use FindBin qw($Bin);
 use lib "$Bin/lib";
@@ -41,6 +42,10 @@ sub main {
 	
 	isa_ok(IO::Any->read([$Bin, 'stock', '01.txt']), 'IO::File', 'IO::Any->read([])');
 	isa_ok(IO::Any->read('{}'), 'IO::String', 'IO::Any->read("{}")');
+
+	throws_ok {
+		IO::Any->write([$tmpdir, 'trash'], {'abc' => 1})
+	} qr{option abc}, 'options check';
 	
 	eq_or_diff(
 		[ IO::Any->slurp([$Bin, 'stock', '01.txt']) ],
@@ -59,6 +64,16 @@ sub main {
 		qq{4\n55\n666\n},
 		'IO::Any->spew()'
 	);
+	my $write_fh = IO::Any->write([$tmpdir, '02-test.txt'], {'atomic' => 1});
+	isa_ok($write_fh, 'IO::AtomicFile', 'check atomic handle');
+	
+	IO::Any->spew([$tmpdir, '03-test.txt'], qq{atom\n}, {'atomic' => 1});
+	eq_or_diff(
+		scalar read_file(File::Spec->catfile($tmpdir, '03-test.txt')),
+		qq{atom\n},
+		'atomic IO::Any->spew()'
+	);
+
 	my $str;
 	IO::Any->spew(\$str, qq{1\n22\n333\n});
 	eq_or_diff(

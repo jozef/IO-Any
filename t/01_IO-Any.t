@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 #use Test::More 'no_plan';
-use Test::More tests => 20;
+use Test::More tests => 28;
 use Test::Differences;
 use File::Spec;
 use File::Temp 'tempdir';
@@ -81,6 +81,33 @@ sub main {
 		qq{1\n22\n333\n},
 		'IO::Any->spew(\$str)'
 	);
+	
+	LOCKING: {
+		my $locking_filename = [$tmpdir, '04-test.txt'];
+		IO::Any->spew($locking_filename, qq{locking\n}, {'LOCK_EX' => 1});
+		eq_or_diff(
+			scalar read_file(File::Spec->catfile(@{$locking_filename})),
+			qq{locking\n},
+			'LOCK_EX IO::Any->spew()'
+		);
+		
+	    my $locked_fh = IO::Any->new($locking_filename, '+>>', {'LOCK_EX' => 1});
+		dies_ok { IO::Any->new($locking_filename, '+>>', {'LOCK_EX' => 1, 'LOCK_NB' => 1}) } 'another non-blocking ex loc should fail';
+		dies_ok { IO::Any->new($locking_filename, '<', {'LOCK_SH' => 1, 'LOCK_NB' => 1}) } 'another non-blocking sh loc should fail';
+		dies_ok { IO::Any->spew($locking_filename, 'grrrr', {'LOCK_EX' => 1, 'LOCK_NB' => 1}) } 'spew() when non-blocking ex loc should fail';
+		$locked_fh->close();
+
+		eq_or_diff(
+			IO::Any->slurp($locking_filename),
+			qq{locking\n},
+			'file should be left intact'
+		);
+		
+	    my $r_locked_fh = IO::Any->read($locking_filename, {'LOCK_SH' => 1});
+	    ok($r_locked_fh, 'this time LOCK_SH');
+		lives_ok { IO::Any->new($locking_filename, '<', {'LOCK_SH' => 1, 'LOCK_NB' => 1}) } 'another non-blocking sh loc should pass';
+		dies_ok { IO::Any->new($locking_filename, '+>>', {'LOCK_EX' => 1, 'LOCK_NB' => 1}) } 'non-blocking ex loc should fail';
+	}
 	
 	return 0;
 }

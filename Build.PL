@@ -16,6 +16,7 @@ my $builder = Module::Build->new(
         'IO::File'   => 0,
         'Scalar::Util'   => 0,
         'IO::AtomicFile' => 0,
+        'Fcntl'          => 0,
     },
     build_requires => {
         'Test::More'        => 0,

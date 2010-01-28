@@ -74,6 +74,7 @@ use IO::String;
 use IO::File;
 use IO::AtomicFile;
 use File::Spec;
+use Fcntl qw(:flock);
 
 =head1 METHODS
 
@@ -100,6 +101,10 @@ Returns filehandle. L<IO::String> for 'string', L<IO::File> for 'file'.
 Here are alvailable C<%$options> options:
 
     atomic    true/false if the file operations should be done using L<IO::AtomicFile> or L<IO::File>
+    LOCK_SH   lock file for shared access
+    LOCK_EX   lock file for exclusive
+    LOCK_NB   lock file non blocking (will throw an excpetion if file is
+                  already locked, instead of blocking the process)
 
 =cut
 
@@ -115,7 +120,7 @@ sub new {
         if ref $opt ne 'HASH';
     foreach my $key (keys %$opt) {
         croak 'unknown option '.$key
-            if (not $key ~~ ['atomic']);
+            if (not $key ~~ ['atomic', 'LOCK_SH', 'LOCK_EX', 'LOCK_NB']);
     }
     
     my ($type, $proper_what) = $class->_guess_what($what);
@@ -126,6 +131,16 @@ sub new {
             my $fh = $opt->{'atomic'} ? IO::AtomicFile->new() : IO::File->new();
             $fh->open($proper_what, $how)
                 or croak 'error opening file "'.$proper_what.'" - '.$!;
+            
+            # locking if requested
+            if ($opt->{'LOCK_SH'} or $opt->{'LOCK_EX'}) {
+                flock($fh,
+                    ($opt->{'LOCK_SH'} ? LOCK_SH : 0)
+                    | ($opt->{'LOCK_EX'} ? LOCK_EX : 0)
+                    | ($opt->{'LOCK_NB'} ? LOCK_NB : 0)
+                ) or croak 'flock failed - '.$!;
+            }
+            
             return $fh;
         }
         when ('iofile')   { return $proper_what }
@@ -191,10 +206,11 @@ Same as C<< IO::Any->new($what, '<'); >> or C<< IO::Any->new($what); >>.
 sub read {
     my $class = shift;
     my $what  = shift;
+    my $opt   = shift;
     croak 'too many arguments'
         if @_;
     
-    return $class->new($what, '<');
+    return $class->new($what, '<', $opt);
 }
 
 
@@ -226,10 +242,11 @@ If L<AnyEvent> is loaded then uses event loop to read the content.
 sub slurp {
     my $class = shift;
     my $what  = shift;
+    my $opt   = shift;
     croak 'too many arguments'
         if @_;
     
-    my $fh = $class->read($what);
+    my $fh = $class->read($what, $opt);
     
     # use event loop when AnyEvent is loaded (skip IO::String, doesn't work and makes no sense)
     if ($INC{'AnyEvent.pm'} and not $fh->isa('IO::String')) {
@@ -280,7 +297,10 @@ sub spew {
     croak 'too many arguments'
         if @_;
     
-    my $fh = $class->write($what, $opt);
+    # "parade" to allow safe locking
+    my $fh = $class->new($what, '+>>', $opt);
+    $fh->seek(0,0);
+    $fh->truncate(0);
 
     # use event loop when AnyEvent is loaded (skip IO::String, doesn't work and makes no sense)
     if ($INC{'AnyEvent.pm'} and not $fh->isa('IO::String')) {

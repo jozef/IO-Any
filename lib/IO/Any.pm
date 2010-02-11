@@ -94,7 +94,8 @@ C<$what> can be:
 		'{"123":[1,2,3]}'         => [ 'string' => '{"123":[1,2,3]}' ],
 		'[1,2,3]'                 => [ 'string' => '[1,2,3]' ],
 		'<xml></xml>'             => [ 'string' => '<xml></xml>' ],
-		"a\nb\nc\n"               => [ 'string' => "a\nb\nc\n" ],    
+		"a\nb\nc\n"               => [ 'string' => "a\nb\nc\n" ],
+		*DATA                     => [ 'file' => *{DATA}{IO} ],
 
 Returns filehandle. L<IO::String> for 'string', L<IO::File> for 'file'.
 'http' not implemented jet :)

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 #use Test::More 'no_plan';
-use Test::More tests => 28;
+use Test::More tests => 32;
 use Test::Differences;
 use File::Spec;
 use File::Temp 'tempdir';
@@ -34,6 +34,7 @@ sub main {
 		'[1,2,3]'                 => [ 'string' => '[1,2,3]' ],
 		'<xml></xml>'             => [ 'string' => '<xml></xml>' ],
 		"a\nb\nc\n"               => [ 'string' => "a\nb\nc\n" ],
+		''                        => [ 'string' => '' ],
 	);
 	
 	while (my ($question, $answer) = splice(@riddles,0,2)) {
@@ -107,6 +108,18 @@ sub main {
 	    ok($r_locked_fh, 'this time LOCK_SH');
 		lives_ok { IO::Any->new($locking_filename, '<', {'LOCK_SH' => 1, 'LOCK_NB' => 1}) } 'another non-blocking sh loc should pass';
 		dies_ok { IO::Any->new($locking_filename, '+>>', {'LOCK_EX' => 1, 'LOCK_NB' => 1}) } 'non-blocking ex loc should fail';
+	}
+	
+	STRANGE_ARGUMENTS: {
+		throws_ok {
+			IO::Any->read()
+		} qr{is missing}, 'there has to be some $what';
+
+		throws_ok {
+			IO::Any->read(undef)
+		} qr{is missing}, 'undef throws an exception';
+
+		lives_ok { IO::Any->read('') } 'empty string is fine to read';
 	}
 	
 	return 0;

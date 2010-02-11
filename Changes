@@ -1,6 +1,8 @@
 Revision history for IO-Any
 
 0.04    25 Dec 2009
+    - empty string as $what
+    - passing undef as $what will croak
     - allow typeglobs (*DATA, *STDIN, ...)
     - file locking
     - allow atomic writes using IO::AtomicFile

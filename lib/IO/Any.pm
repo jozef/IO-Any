@@ -116,6 +116,9 @@ sub new {
     my $opt   = shift || {};
     croak 'too many arguments'
         if @_;
+
+    croak '$what is missing'
+        if not defined $what;
     
     croak 'expecting hash ref'
         if ref $opt ne 'HASH';
@@ -158,6 +161,8 @@ Returns ($type, $what). $type can be:
     file
     string
     http
+    iostring
+    iofile
 
 C<$what> is normalized path that can be used for IO::*.
 
@@ -198,6 +203,7 @@ sub _guess_what {
         when (m(^{))            { return ('string', $what) }         # json string
         when (m{^\[})           { return ('string', $what) }         # json string
         when (m{\n[\s\w]})      { return ('string', $what) }         # multi-line string
+        when ('')               { return ('string', '') }            # empty string
         default                 { return ('file', $what) }           # default is filename
     }
 }

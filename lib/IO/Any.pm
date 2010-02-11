@@ -65,7 +65,7 @@ Any suggestions, questions and also demotivations are more than welcome!
 use warnings;
 use strict;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use 5.010;
 

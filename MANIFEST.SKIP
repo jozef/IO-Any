@@ -31,3 +31,5 @@
 ^tmp/
 .*\.tar\.gz
 ^MYMETA.yml$
+^IO-Any-
+

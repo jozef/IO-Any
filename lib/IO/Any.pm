@@ -19,6 +19,7 @@ IO::Any - open anything
     $fh = IO::Any->read(\"some text\nwith more lines\n");
     $fh = IO::Any->read('{"123":[1,2,3]}');
     $fh = IO::Any->read('<root><element>abc</element></root>');
+    $fh = IO::Any->read(*DATA);
     #$fh = IO::Any->read(IO::String->new("cba"));
     #$fh = IO::Any->read($object_with_toString_method);
 
@@ -185,6 +186,11 @@ sub _guess_what {
         default { croak 'no support for ref '.(ref $what) }
     }
     
+    # check for typeglobs
+    if ((ref \$what eq 'GLOB') and (my $fh = *{$what}{IO})) {
+        return ('iofile', $fh);
+    }
+
     given ($what) {
         when (m{^file://(.+)$}) { return ('file', $1) }              # local file
         when (m{^https?://})    { return ('http', $what) }           # http link

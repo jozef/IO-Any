@@ -6,6 +6,8 @@ MANIFEST			This list of files
 META.yml
 README
 t/01_IO-Any.t
+t/02_IO-Any_AnyEvent.t
+t/03_DATA.t
 t/distribution.t
 t/fixme.t
 t/pod-coverage.t

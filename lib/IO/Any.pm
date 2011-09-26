@@ -69,7 +69,7 @@ our $VERSION = '0.05';
 
 use 5.010;
 
-use Carp 'croak';
+use Carp 'confess';
 use Scalar::Util 'blessed';
 use IO::String;
 use IO::File;
@@ -115,16 +115,16 @@ sub new {
     my $what  = shift;
     my $how   = shift || '<';
     my $opt   = shift || {};
-    croak 'too many arguments'
+    confess 'too many arguments'
         if @_;
 
-    croak '$what is missing'
+    confess '$what is missing'
         if not defined $what;
     
-    croak 'expecting hash ref'
+    confess 'expecting hash ref'
         if ref $opt ne 'HASH';
     foreach my $key (keys %$opt) {
-        croak 'unknown option '.$key
+        confess 'unknown option '.$key
             if (not $key ~~ ['atomic', 'LOCK_SH', 'LOCK_EX', 'LOCK_NB']);
     }
     
@@ -135,7 +135,7 @@ sub new {
         when ('file')   {
             my $fh = $opt->{'atomic'} ? IO::AtomicFile->new() : IO::File->new();
             $fh->open($proper_what, $how)
-                or croak 'error opening file "'.$proper_what.'" - '.$!;
+                or confess 'error opening file "'.$proper_what.'" - '.$!;
             
             # locking if requested
             if ($opt->{'LOCK_SH'} or $opt->{'LOCK_EX'}) {
@@ -143,7 +143,7 @@ sub new {
                     ($opt->{'LOCK_SH'} ? LOCK_SH : 0)
                     | ($opt->{'LOCK_EX'} ? LOCK_EX : 0)
                     | ($opt->{'LOCK_NB'} ? LOCK_NB : 0)
-                ) or croak 'flock failed - '.$!;
+                ) or confess 'flock failed - '.$!;
             }
             
             return $fh;
@@ -178,18 +178,19 @@ sub _guess_what {
         when ('Path::Class::File') { $what = $what->stringify }
         when (['IO::File', 'IO::AtomicFile']) {
             croak 'passed unopened IO::File'
+            confess 'passed unopened IO::File'
                 if not $what->opened;
             return ('iofile', $what);
         }
         when ('IO::String')        { return ('iostring', $what) }
-        default { croak 'no support for '.$_ };
+        default { confess 'no support for '.$_ };
     }
     
     given (ref $what) {
         when ('ARRAY')  { return ('file', File::Spec->catfile(@{$what})) }
         when ('SCALAR') { return ('string', $what) }
         when ('')      {} # do nothing here if not reference
-        default { croak 'no support for ref '.(ref $what) }
+        default { confess 'no support for ref '.(ref $what) }
     }
     
     # check for typeglobs
@@ -220,7 +221,7 @@ sub read {
     my $class = shift;
     my $what  = shift;
     my $opt   = shift;
-    croak 'too many arguments'
+    confess 'too many arguments'
         if @_;
     
     return $class->new($what, '<', $opt);
@@ -237,7 +238,7 @@ sub write {
     my $class = shift;
     my $what  = shift;
     my $opt   = shift;
-    croak 'too many arguments'
+    confess 'too many arguments'
         if @_;
     
     return $class->new($what, '>', $opt);
@@ -256,7 +257,7 @@ sub slurp {
     my $class = shift;
     my $what  = shift;
     my $opt   = shift;
-    croak 'too many arguments'
+    confess 'too many arguments'
         if @_;
     
     my $fh = $class->read($what, $opt);
@@ -307,7 +308,7 @@ sub spew {
     my $what  = shift;
     my $data  = shift;
     my $opt   = shift;
-    croak 'too many arguments'
+    confess 'too many arguments'
         if @_;
     
     # "parade" to allow safe locking
@@ -342,7 +343,7 @@ sub spew {
     }
 
     print $fh $data;
-    $fh->close || croak 'failed to close file - '.$!;
+    $fh->close || confess 'failed to close file - '.$!;
     return;
 }
 

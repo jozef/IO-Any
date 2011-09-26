@@ -176,8 +176,7 @@ sub _guess_what {
     given (blessed $what) {
         when (undef) {}            # not blessed, do nothing
         when ('Path::Class::File') { $what = $what->stringify }
-        when (['IO::File', 'IO::AtomicFile']) {
-            croak 'passed unopened IO::File'
+        when (['IO::File', 'IO::AtomicFile', 'IO::Uncompress::Bunzip2']) {
             confess 'passed unopened IO::File'
                 if not $what->opened;
             return ('iofile', $what);

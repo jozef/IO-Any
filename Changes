@@ -2,6 +2,7 @@ Revision history for IO-Any
 
 0.05    26 Sep 2011
     - confess intead of croak for exceptions
+    - allow IO::Uncompress::Bunzip2
 
 0.04    25 Dec 2009
     - empty string as $what

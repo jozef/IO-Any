@@ -256,18 +256,16 @@ There are two methods L</slurp> and L</spew> to read/write whole C<$what>.
 
 =head1 MOTIVATION
 
-The purpose is to be able to write portable one-liners (both commandline
+The purpose is to be able to write portable one-liners (both command-line
 and inside program) to read/write/slurp/spew files/strings/$what-ever.
 As I'm sick of writing C<< File::Spec->catfile('folder', 'filename')  >>
 or C<< use Path::Class; dir(); file(); >>.
 
 First time I've used L<IO::Any> for L<JSON::Util> where for the function
-to encode and decode files I can just say put as an argumen anything that
+to encode and decode files I can just say put as an argument anything that
 L<IO::Any> accepts. It's then up to the users of that module to pass an array
 if it's a file, scalar ref if it is a string or relay on the module to
 guess $what.
-
-Any suggestions, questions and also demotivations are more than welcome!
 
 =head1 METHODS
 
@@ -292,7 +290,7 @@ C<$what> can be:
 Returns filehandle. L<IO::String> for 'string', L<IO::File> for 'file'.
 'http' not implemented jet :)
 
-Here are alvailable C<%$options> options:
+Here are available C<%$options> options:
 
     atomic    true/false if the file operations should be done using L<IO::AtomicFile> or L<IO::File>
     LOCK_SH   lock file for shared access

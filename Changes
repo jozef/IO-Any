@@ -1,6 +1,9 @@
 Revision history for IO-Any
 
-0.05    26 Sep 2011
+0.06    ???
+    - ???
+
+0.05    23 Dec 2012
     - confess intead of croak for exceptions
     - allow IO::Uncompress::Bunzip2
 

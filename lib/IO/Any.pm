@@ -3,7 +3,7 @@ package IO::Any;
 use warnings;
 use strict;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use 5.010;
 

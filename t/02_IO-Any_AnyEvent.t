@@ -6,6 +6,8 @@ use warnings;
 #use Test::More 'no_plan';
 use Test::More;
 BEGIN {
+	plan skip_all => "Cannot run on Windows"
+		if $^O eq 'MSWin32';
 	eval "use AnyEvent";
 	plan skip_all => "requires AnyEvent to run"
 		if $@;

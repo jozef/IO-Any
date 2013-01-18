@@ -9,6 +9,9 @@ my $builder = Module::Build->new(
     license             => 'perl',
     dist_author         => 'Jozef Kutej <jkutej@cpan.org>',
     dist_version_from   => 'lib/IO/Any.pm',
+    configure_requires => {
+        'Module::Build' => 0.36,
+    },
     requires => {
         'Carp'       => 0,
         'File::Spec' => 0,
@@ -26,7 +29,6 @@ my $builder = Module::Build->new(
         'Test::Exception'   => 0,
     },
     add_to_cleanup      => [ 'IO-Any-*' ],
-    create_makefile_pl => 'traditional',
     create_readme       => 1,
     sign                => 1,
     meta_merge => {

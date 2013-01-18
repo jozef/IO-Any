@@ -1,8 +1,8 @@
 Build.PL
 Changes
 lib/IO/Any.pm
-Makefile.PL
 MANIFEST			This list of files
+META.json
 META.yml
 README
 t/01_IO-Any.t
@@ -14,4 +14,3 @@ t/pod-coverage.t
 t/pod-spell.t
 t/pod.t
 t/stock/01.txt
-META.json

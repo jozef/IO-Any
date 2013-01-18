@@ -55,7 +55,7 @@ sub new {
         }
         when ('iofile')   { return $proper_what }
         when ('iostring') { return $proper_what }
-        when ('http')     { die 'no http support jet :-|' }
+        when ('http')     { die 'no http support yet :-|' }
     }
 }
 
@@ -129,7 +129,8 @@ sub slurp {
     my $fh = $class->read($what, $opt);
     
     # use event loop when AnyEvent is loaded (skip IO::String, doesn't work and makes no sense)
-    if ($INC{'AnyEvent.pm'} and not $fh->isa('IO::String')) {
+    # not supported under MSWin32
+    if ($INC{'AnyEvent.pm'} and not $fh->isa('IO::String') and ($^O ne 'MSWin32')) {
         eval 'use AnyEvent::Handle'
             if not $INC{'AnyEvent/Handle.pm'};
         my $eof = AnyEvent->condvar;
@@ -215,7 +216,7 @@ IO::Any - open anything
 
 =head1 SYNOPSIS
 
-    # NOTE commented out lines doesn't work (jet)
+    # NOTE commented out lines doesn't work (yet)
     use IO::Any;
 
     $fh = IO::Any->read('filename');
@@ -229,7 +230,7 @@ IO::Any - open anything
     $fh = IO::Any->read('{"123":[1,2,3]}');
     $fh = IO::Any->read('<root><element>abc</element></root>');
     $fh = IO::Any->read(*DATA);
-    #$fh = IO::Any->read(IO::String->new("cba"));
+    $fh = IO::Any->read(IO::String->new("cba"));
     #$fh = IO::Any->read($object_with_toString_method);
 
     $fh = IO::Any->write('filename');
@@ -256,16 +257,15 @@ There are two methods L</slurp> and L</spew> to read/write whole C<$what>.
 
 =head1 MOTIVATION
 
-The purpose is to be able to write portable one-liners (both command-line
-and inside program) to read/write/slurp/spew files/strings/$what-ever.
-As I'm sick of writing C<< File::Spec->catfile('folder', 'filename')  >>
-or C<< use Path::Class; dir(); file(); >>.
+The purpose is to be able to use L<IO::Any> in other modules that needs
+to read or write data. The description for an argument could be - pass
+anything that L<IO::Any> accepts as argument - GLOBs, L<IO::File>,
+L<Path::Class::File>, L<IO::AtomicFile>, L<IO::String>, pointers to scalar
+and pointer to array (array elements are passed to L<File::Spec/catfile>
+as portable file addressing).
 
-First time I've used L<IO::Any> for L<JSON::Util> where for the function
-to encode and decode files I can just say put as an argument anything that
-L<IO::Any> accepts. It's then up to the users of that module to pass an array
-if it's a file, scalar ref if it is a string or relay on the module to
-guess $what.
+First time I've used L<IO::Any> for L<JSON::Util> where for the functions
+to encode and decode needs to read/write data.
 
 =head1 METHODS
 
@@ -288,7 +288,7 @@ C<$what> can be:
 		*DATA                     => [ 'file' => *{DATA}{IO} ],
 
 Returns filehandle. L<IO::String> for 'string', L<IO::File> for 'file'.
-'http' not implemented jet :)
+'http' not implemented yet.
 
 Here are available C<%$options> options:
 

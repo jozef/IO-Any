@@ -1,7 +1,8 @@
 Revision history for IO-Any
 
-0.06    ???
-    - ???
+0.06    12 Jan 2013
+    - disabled AnyEvent for MSWin32 (thanks Alexandr Ciornii and Gabor Szabo)
+    - Pod updates
 
 0.05    23 Dec 2012
     - confess intead of croak for exceptions

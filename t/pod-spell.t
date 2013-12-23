@@ -22,5 +22,6 @@ add_stopwords(qw(
 	AnnoCPAN
 	http
 	GitHub
+	GLOBs
 ));
 all_pod_files_spelling_ok();

@@ -4,12 +4,14 @@ use strict;
 use warnings;
 
 #use Test::More 'no_plan';
-use Test::More tests => 32;
+use Test::More tests => 34;
 use Test::Differences;
 use File::Spec;
 use File::Temp 'tempdir';
 use File::Slurp 'read_file';
 use Test::Exception;
+use IO::File;
+use Scalar::Util 'blessed';
 
 use FindBin qw($Bin);
 use lib "$Bin/lib";
@@ -23,6 +25,10 @@ exit main();
 sub main {
 	my $tmpdir = tempdir( CLEANUP => 1 );
 
+    throws_ok { IO::Any->new('', '<', { unknown => 1 }) } qr/unknown option/, 'option checking';
+
+    my $io_file = IO::File->new();
+    $io_file->open('< '.__FILE__);
 	my @riddles = (
 		'filename'                => [ 'file' => 'filename' ],
 		'folder/filename'         => [ 'file' => 'folder/filename' ],
@@ -35,10 +41,12 @@ sub main {
 		'<xml></xml>'             => [ 'string' => '<xml></xml>' ],
 		"a\nb\nc\n"               => [ 'string' => "a\nb\nc\n" ],
 		''                        => [ 'string' => '' ],
+		$io_file                  => [ 'iofile' => 'IO::File' ],
 	);
 	
-	while (my ($question, $answer) = splice(@riddles,0,2)) {
-		eq_or_diff([ IO::Any->_guess_what($question) ], $answer, 'guess what is "'.$question.'"')
+	while (my ($question, $answer_expected) = splice(@riddles,0,2)) {
+		my ($type, $answer) = IO::Any->_guess_what($question);
+		eq_or_diff([$type, blessed($answer) ? blessed($answer) : $answer], $answer_expected, 'guess what is "'.$question.'"')
 	}
 	
 	isa_ok(IO::Any->read([$Bin, 'stock', '01.txt']), 'IO::File', 'IO::Any->read([])');

@@ -3,7 +3,7 @@ package IO::Any;
 use warnings;
 use strict;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Carp 'confess';
 use Scalar::Util 'blessed';
@@ -331,6 +331,18 @@ L<IO::All>, L<File::Spec>, L<Path::Class>
 
 Jozef Kutej, C<< <jkutej at cpan.org> >>
 
+=head1 CONTRIBUTORS
+
+The following people have contributed to the Sys::Path by commiting their
+code, sending patches, reporting bugs, asking questions, suggesting useful
+advices, nitpicking, chatting on IRC or commenting on my blog (in no particular
+order):
+
+    SREZIC [...] cpan.org
+    Alexandr Ciornii
+    Gabor Szabo
+    Przemek Wesołek
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-io-any at rt.cpan.org>, or through
@@ -372,9 +384,6 @@ L<http://cpanratings.perl.org/d/IO-Any>
 L<http://search.cpan.org/dist/IO-Any>
 
 =back
-
-
-=head1 ACKNOWLEDGEMENTS
 
 
 =head1 COPYRIGHT & LICENSE

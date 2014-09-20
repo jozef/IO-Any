@@ -115,6 +115,17 @@ SEE ALSO
 AUTHOR
     Jozef Kutej, `<jkutej at cpan.org>'
 
+CONTRIBUTORS
+    The following people have contributed to the Sys::Path by commiting
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advices, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
+
+        SREZIC [...] cpan.org
+        Alexandr Ciornii
+        Gabor Szabo
+        Przemek Wesołek
+
 BUGS
     Please report any bugs or feature requests to `bug-io-any at
     rt.cpan.org', or through the web interface at
@@ -144,7 +155,6 @@ SUPPORT
     * Search CPAN
         http://search.cpan.org/dist/IO-Any
 
-ACKNOWLEDGEMENTS
 COPYRIGHT & LICENSE
     Copyright 2009 Jozef Kutej, all rights reserved.
 

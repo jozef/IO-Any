@@ -20,6 +20,7 @@ my $builder = Module::Build->new(
         'Scalar::Util'   => 0,
         'IO::AtomicFile' => 0,
         'Fcntl'          => 0,
+        'List::MoreUtils' => 0,
     },
     build_requires => {
         'Test::More'        => 0,
@@ -30,7 +31,6 @@ my $builder = Module::Build->new(
     },
     add_to_cleanup      => [ 'IO-Any-*' ],
     create_readme       => 1,
-    sign                => 1,
     meta_merge => {
         resources => {
             repository => 'git://github.com/jozef/IO-Any.git',

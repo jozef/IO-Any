@@ -1,5 +1,8 @@
 Revision history for IO-Any
 
+0.09    21 Sep 2014
+    - fix dist tests
+
 0.08    20 Sep 2014
     - fix requires (thanks Przemek Wesołek)
 

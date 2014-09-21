@@ -2,8 +2,9 @@ package IO::Any;
 
 use warnings;
 use strict;
+use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Carp 'confess';
 use Scalar::Util 'blessed';
@@ -203,6 +204,8 @@ sub spew {
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 IO::Any - open anything
@@ -333,15 +336,16 @@ Jozef Kutej, C<< <jkutej at cpan.org> >>
 
 =head1 CONTRIBUTORS
 
-The following people have contributed to the Sys::Path by commiting their
+The following people have contributed to the Sys::Path by committing their
 code, sending patches, reporting bugs, asking questions, suggesting useful
-advices, nitpicking, chatting on IRC or commenting on my blog (in no particular
+advice, nitpicking, chatting on IRC or commenting on my blog (in no particular
 order):
 
     SREZIC [...] cpan.org
     Alexandr Ciornii
     Gabor Szabo
     Przemek Wesołek
+    Slaven Rezić
 
 =head1 BUGS
 

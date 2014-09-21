@@ -8,9 +8,9 @@ README
 t/01_IO-Any.t
 t/02_IO-Any_AnyEvent.t
 t/03_DATA.t
-t/distribution.t
-t/fixme.t
-t/pod-coverage.t
-t/pod-spell.t
-t/pod.t
 t/stock/01.txt
+xt/distribution.t
+xt/fixme.t
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod.t

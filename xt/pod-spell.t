@@ -23,5 +23,6 @@ add_stopwords(qw(
 	http
 	GitHub
 	GLOBs
+	blog
 ));
 all_pod_files_spelling_ok();

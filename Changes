@@ -1,5 +1,8 @@
 Revision history for IO-Any
 
+0.10    9 Nov 2017
+    - BINMODE option added to set binmode(), ":utf8" as default
+
 0.09    21 Sep 2014
     - fix dist tests
 

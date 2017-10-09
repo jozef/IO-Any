@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use utf8;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp 'confess';
 use Scalar::Util 'blessed';
@@ -30,7 +30,7 @@ sub new {
         if ref $opt ne 'HASH';
     foreach my $key (keys %$opt) {
         confess 'unknown option '.$key
-            if (none { $key eq $_ } qw(atomic LOCK_SH LOCK_EX LOCK_NB));
+            if (none { $key eq $_ } qw(atomic LOCK_SH LOCK_EX LOCK_NB BINMODE));
     }
 
     my ($type, $proper_what) = $class->_guess_what($what);
@@ -41,6 +41,7 @@ sub new {
             my $fh = $opt->{'atomic'} ? IO::AtomicFile->new() : IO::File->new();
             $fh->open($proper_what, $how)
                 or confess 'error opening file "'.$proper_what.'" - '.$!;
+            binmode($fh, ($opt->{BINMODE} || ':utf8'));
 
             # locking if requested
             if ($opt->{'LOCK_SH'} or $opt->{'LOCK_EX'}) {
@@ -289,6 +290,7 @@ Returns filehandle. L<IO::String> for 'string', L<IO::File> for 'file'.
 Here are available C<%$options> options:
 
     atomic    true/false if the file operations should be done using L<IO::AtomicFile> or L<IO::File>
+    BINARY    filehandles opened in binary mode, otherwise by default ":utf8" is set
     LOCK_SH   lock file for shared access
     LOCK_EX   lock file for exclusive
     LOCK_NB   lock file non blocking (will throw an excpetion if file is

@@ -32,30 +32,32 @@ exit main();
 sub main {
 	my $tmpdir = tempdir( CLEANUP => 1 );
 
+	my $opt = { BINMODE => ':raw' };
+
 	eq_or_diff(
-		[ IO::Any->slurp([$Bin, 'stock', '01.txt']) ],
+		[ IO::Any->slurp([$Bin, 'stock', '01.txt'], $opt) ],
 		[ qq{1\n22\n333\n} ],
 		'[ IO::Any->slurp() ]'
 	);
 	eq_or_diff(
-		scalar IO::Any->slurp([$Bin, 'stock', '01.txt']),
+		scalar IO::Any->slurp([$Bin, 'stock', '01.txt'], $opt),
 		qq{1\n22\n333\n},
 		'scalar IO::Any->slurp()'
 	);
 	eq_or_diff(
-		scalar IO::Any->slurp(\qq{1\n22\n333\n}),
+		scalar IO::Any->slurp(\qq{1\n22\n333\n}, $opt),
 		qq{1\n22\n333\n},
 		'IO::Any->slurp() string'
 	);
 	
-	IO::Any->spew([$tmpdir, '02-test.txt'], qq{4\n55\n666\n});
+	IO::Any->spew([$tmpdir, '02-test.txt'], qq{4\n55\n666\n}, $opt);
 	eq_or_diff(
 		scalar read_file(File::Spec->catfile($tmpdir, '02-test.txt')),
 		qq{4\n55\n666\n},
 		'IO::Any->spew()'
 	);
 	my $str;
-	IO::Any->spew(\$str, qq{1\n22\n333\n});
+	IO::Any->spew(\$str, qq{1\n22\n333\n}, $opt);
 	eq_or_diff(
 		$str,
 		qq{1\n22\n333\n},

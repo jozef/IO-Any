@@ -13,7 +13,7 @@ use IO::File;
 use IO::AtomicFile;
 use File::Spec;
 use Fcntl qw(:flock);
-use List::MoreUtils qw(none any);
+use List::Util qw(none any);
 
 sub new {
     my $class = shift;
@@ -290,7 +290,7 @@ Returns filehandle. L<IO::String> for 'string', L<IO::File> for 'file'.
 Here are available C<%$options> options:
 
     atomic    true/false if the file operations should be done using L<IO::AtomicFile> or L<IO::File>
-    BINARY    filehandles opened in binary mode, otherwise by default ":utf8" is set
+    BINMODE   filehandles opened in the given mode, otherwise by default ":utf8" is set
     LOCK_SH   lock file for shared access
     LOCK_EX   lock file for exclusive
     LOCK_NB   lock file non blocking (will throw an excpetion if file is
